@@ -12,3 +12,9 @@ To ensure reliability and minimize false alarms, NLP-based validation is impleme
 This intelligent automation ensures faster incident response, zero false positives, and 24/7 continuous surveillance. The system can be deployed in various real-world applications such as factories, research laboratories, warehouses, government facilities, and military bases, where maintaining security and restricted access is critical.
 
 Overall, this project demonstrates how combining modern AI, IoT, and communication technologies can create a robust, scalable, and real-time anomaly detection framework that enhances safety, reduces human intervention, and provides immediate alerts during potential perimeter breaches.
+
+
+Important>>>
+1.change email id and respective Auth pass 
+2 login twilio and use that sid , pass , duplicate number .
+3.In terminal type "python run.py" to run the program.
