@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSTPS - Security Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c, #1a1a2e);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #b0b0b0;
+            font-size: 1.1em;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card {
+            text-align: center;
+            background: linear-gradient(135deg, #2d3436, #636e72);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alert-card {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+        }
+
+        .evidence-card {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #74b9ff;
+            border-bottom: 2px solid rgba(116, 185, 255, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .alert-item {
+            background: rgba(255, 255, 255, 0.08);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            transition: all 0.3s ease;
+        }
+
+        .alert-item.zone-breach {
+            border-left-color: #ff6b6b;
+        }
+
+        .alert-item.suspicious-action {
+            border-left-color: #feca57;
+        }
+
+        .alert-item.normal {
+            border-left-color: #48dbfb;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .alert-camera {
+            font-weight: bold;
+            color: #74b9ff;
+        }
+
+        .alert-type {
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .alert-time {
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+
+        .alert-confidence {
+            color: #feca57;
+            font-weight: bold;
+        }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .evidence-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .evidence-item:hover {
+            transform: scale(1.05);
+        }
+
+        .evidence-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #2d3436;
+        }
+
+        .evidence-info {
+            padding: 8px;
+            font-size: 0.8em;
+        }
+
+        .evidence-camera {
+            font-weight: bold;
+            color: #74b9ff;
+        }
+
+        .evidence-type {
+            color: #feca57;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00b894;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 DSTPS Security Dashboard</h1>
+            <p>Real-time Security Monitoring & Alert System</p>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <span>System Active - Monitoring in Progress</span>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh Data</button>
+
+        <div class="stats-grid" id="stats-grid">
+            <!-- Statistics will be loaded here -->
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card alert-card">
+                <h2 class="card-title">📊 Recent Alerts</h2>
+                <div id="alerts-container">
+                    <!-- Alerts will be loaded here -->
+                </div>
+            </div>
+
+            <div class="card evidence-card">
+                <h2 class="card-title">📸 Recent Evidence</h2>
+                <div class="evidence-grid" id="evidence-container">
+                    <!-- Evidence images will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load all dashboard data
+        async function loadAllData() {
+            await loadStats();
+            await loadAlerts();
+            await loadEvidence();
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+
+                const statsGrid = document.getElementById('stats-grid');
+                statsGrid.innerHTML = `
+                    <div class="card stat-card">
+                        <div class="stat-label">Total Alerts</div>
+                        <div class="stat-number">${stats.total_alerts}</div>
+                        <div class="stat-desc">All Time</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Today's Alerts</div>
+                        <div class="stat-number">${stats.today_alerts}</div>
+                        <div class="stat-desc">24 Hours</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Zone Breaches</div>
+                        <div class="stat-number">${stats.zone_breaches}</div>
+                        <div class="stat-desc">Restricted Area</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Suspicious Actions</div>
+                        <div class="stat-number">${stats.suspicious_actions}</div>
+                        <div class="stat-desc">Behavior Detection</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch('/api/alerts');
+                const alerts = await response.json();
+
+                const alertsContainer = document.getElementById('alerts-container');
+
+                if (alerts.length === 0) {
+                    alertsContainer.innerHTML = '<div class="alert-item normal">No alerts yet. System is monitoring...</div>';
+                    return;
+                }
+
+                alertsContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert-item ${alert.alert_type || 'normal'}">
+                        <div class="alert-header">
+                            <span class="alert-camera">${alert.camera_name || 'Unknown Camera'}</span>
+                            <span class="alert-type">${alert.alert_type || 'info'}</span>
+                        </div>
+                        <div class="alert-time">${formatTimestamp(alert.timestamp)}</div>
+                        <div>Location: ${alert.location || 'Unknown'}</div>
+                        <div>Action: ${alert.action_type || 'Normal'}</div>
+                        <div>Confidence: <span class="alert-confidence">${(alert.confidence * 100).toFixed(1)}%</span></div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        // Load evidence images
+        async function loadEvidence() {
+            try {
+                const response = await fetch('/api/evidence');
+                const evidence = await response.json();
+
+                const evidenceContainer = document.getElementById('evidence-container');
+
+                if (evidence.length === 0) {
+                    evidenceContainer.innerHTML = '<div>No evidence images yet.</div>';
+                    return;
+                }
+
+                evidenceContainer.innerHTML = evidence.map(ev => `
+                    <div class="evidence-item">
+                        <img src="/evidence/${ev.filename}" alt="Evidence" class="evidence-img"
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDE1MCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMmQzNDM2Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5FdmlkZW5jZSBJbWFnZTwvdGV4dD4KPC9zdmc+'">
+                        <div class="evidence-info">
+                            <div class="evidence-camera">${ev.camera}</div>
+                            <div class="evidence-type">${ev.type}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading evidence:', error);
+            }
+        }
+
+        // Format timestamp for display
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Auto-refresh every 5 seconds
+        setInterval(loadAllData, 5000);
+
+        // Initial load
+        loadAllData();
+    </script>
+</body>
+</html>
